@@ -4,8 +4,73 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-do List</title>
+    <title>To-do</title>
+    <script src="https://kit.fontawesome.com/7734e51b41.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <header>
+        <h2> <i class="fa-solid fa-list-check"></i>To-Do</h2>
+        <form action="">
+            <button><i class="fa-solid fa-magnifying-glass"></i></button>
+            <input type="text">
+        </form>
+        <div>
+            <button class="create-button">New Task</button>
+            <button class="create-button" >New List</button>
+        </div>
+        <div class="user-wrap">
+            <img src="./professionalPhoto.jpg" alt="">
+            <h4>Ahmed Saad</h4>
+        </div>
+    </header>
+    
+    <main>
+        <div class="main-header">
+            <h1>Hello, Ahmed</h1>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <h3>To-Do Lists <i class="fa-solid fa-circle-plus"></i></h3>
+                <div>
+                    <div>Personal</div>
+                    <div>Work</div>
+                    <div>Grocery</div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Today <i class="fa-solid fa-circle-plus"></i></h3>
+                <div>
+                    <input type="checkbox" id="task1" name="task1">
+                    <label for="task1">task1</label><br>
+                    <input type="checkbox" id="task2" name="task2">
+                    <label for="task1">task2</label><br>
+                    <input type="checkbox" id="task3" name="task3">
+                    <label for="task1">task3</label>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Tomorrow <i class="fa-solid fa-circle-plus"></i></h3>
+                <div>
+                    <input type="checkbox" id="task1" name="task1">
+                    <label for="task1">task1</label><br>
+                    <input type="checkbox" id="task2" name="task2">
+                    <label for="task1">task2</label><br>
+                    <input type="checkbox" id="task3" name="task3">
+                    <label for="task1">task3</label>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Upcoming 7 days <i class="fa-solid fa-circle-plus"></i></h3>
+                <div>
+                    <input type="checkbox" id="task1" name="task1">
+                    <label for="task1">task1</label><br>
+                    <input type="checkbox" id="task2" name="task2">
+                    <label for="task1">task2</label><br>
+                    <input type="checkbox" id="task3" name="task3">
+                    <label for="task1">task3</label>
+                </div>
+            </div>
+    </div>
+    </main>
 </body>
 </html>

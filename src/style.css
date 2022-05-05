@@ -1,3 +1,86 @@
-* {
-    color: red
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* margin: 0.4rem 2rem; */
+    padding: 0.4rem 2rem;
+    background-color: rgb(5, 5, 83);
+    color: white;
+}
+
+header h2 i{
+    padding-right: 0.5rem;
+}
+
+header button {
+    background-color: rgb(5, 5, 83);
+    border: none;
+    color: white;
+}
+
+.create-button {
+    padding: 0.5rem;
+    border-radius: 20px;
+    background-color: blue;
+    width: 5rem;
+}
+
+header input {
+    border-radius: 20px;
+    padding: 0.5rem;
+    border: none;
+}
+
+.user-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.user-wrap img{
+    border-radius: 20px;
+    width: 40px;
+    height: 40px;
+    padding-right: 0.5rem;
+}
+
+main {
+    display: grid;
+    grid-template-rows: 1fr 8fr;
+    background-color: rgb(207, 203, 203);
+    min-height: 90vh;
+    /* height: 80%; */
+}
+
+main * {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+}
+
+.card {
+    background-color: white;
+    height: fit-content;
+    min-height: 30vh;
+}
+
+.card h3 {
+    border-bottom: 1px solid black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card * {
+    padding-top: 0.25rem;
 }
