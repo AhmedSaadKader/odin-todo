@@ -64,7 +64,8 @@ main * {
 
 .cards {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: 1fr repeat(2, 2fr);
+    /* grid-template-rows:  */
     gap: 1rem;
 }
 
@@ -82,5 +83,52 @@ main * {
 }
 
 .card * {
-    padding-top: 0.25rem;
+    padding-top: 0.25rem;   
+}
+
+.modal {
+    padding: 1em;
+    max-width: 50ch;
+    min-width: 20ch;
+    margin: auto;
+}
+
+.modal-content form{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-content form div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-content form input, select {
+    padding: 0.25rem 0.25rem;
+    border-radius: 10px;
+    width: 60%;
+}
+
+.modal-content form div button {
+    width: 40%;
+    margin: 0 20px;
+}
+
+.single-task {
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+}
+
+.span-right {
+    float: right;
+}
+
+.high {
+    border: 1px solid red;
+}
+
+.medium {
+    border: 1px solid green;
 }
