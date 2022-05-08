@@ -12,7 +12,7 @@
         <h2> <i class="fa-solid fa-list-check"></i>To-Do</h2>
         <form action="">
             <button><i class="fa-solid fa-magnifying-glass"></i></button>
-            <input type="text">
+            <input type="text" id="search">
         </form>
         <div>
             <button class="create-button new-task-button">New Task</button>
@@ -52,6 +52,11 @@
                         <input type="text" id="task-description" name="task-description">
                     </div>
                     <div>
+                        <label for="task-category">Category:</label>
+                        <select id="task-category" name="task-category">
+                        </select> 
+                    </div>
+                    <div>
                         <label for="task-date">Due-Date:</label>
                         <input type="date" id="task-date" name="task-date">
                     </div>
@@ -70,6 +75,25 @@
                     <div>
                         <button type="submit" value="Submit" id="save-task">Save</button>
                         <button id="close-task-modal">close</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
+        <dialog class="modal" id="list-modal">
+            <h2>Add New Category</h2>
+            <div class="modal-content">
+                <form action="" id="list-form">
+                    <div>
+                        <label for="list-title">Title:</label>
+                        <input type="text" name="list-title" id="list-title" required>
+                    </div>
+                    <div>
+                        <label for="list-description">Description:</label>
+                        <input type="text" name="list-description" id="list-description">
+                    </div>
+                    <div>
+                        <button id="save-list">Save</button>
+                        <button id="close-list">Close</button>
                     </div>
                 </form>
             </div>

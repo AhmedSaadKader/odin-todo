@@ -121,6 +121,10 @@ main * {
     cursor: pointer;
 }
 
+.task-done {
+    text-decoration-line: line-through;
+}
+
 .span-right {
     float: right;
 }
