@@ -1,7 +1,8 @@
 export default class ToDoItem {
-    constructor (title, description, dueDate, priority, done=false) {
+    constructor (title, description,category, dueDate, priority, done=false) {
         this.title = title
         this.description = description
+        this.category = category
         this.dueDate = dueDate
         this.priority = priority
         this.done = done
