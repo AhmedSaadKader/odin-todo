@@ -3,7 +3,7 @@ import ToDoItem from './to_do_item';
 import ToDoList from './to_do_list';
 
 // defaults
-const personalToDoList = new ToDoList('Personal', 'Personal')
+// const personalToDoList = new ToDoList('Personal', 'Personal')
 const workToDoList = new ToDoList('Work', 'Work')
 const toDoCategories = []
 const allTasks = []
@@ -29,13 +29,38 @@ const newTaskPriority = document.getElementById('task-priority')
 const newListTitle = document.getElementById('list-title')
 const newListDescription = document.getElementById('list-description')
 
+
+// test
+const testButton = document.querySelector('.user-wrap')
+testButton.addEventListener('click', () => {
+  console.log(localStorage)
+  console.log(toDoCategories)
+  console.log(allTasks)
+})
+
 // Event Listeners
 window.addEventListener('load', pageLoad)
 newTaskButtons.forEach((button)=>{button.addEventListener('click', openTaskModal)})
-saveNewTaskButton.addEventListener('click', (e)=>{e.preventDefault(); addToDoTask(createNewTaskInstance())})
+saveNewTaskButton.addEventListener('click', (e)=>{
+  let isFormValid = taskFormElement.checkValidity();
+  if (!isFormValid){
+    taskFormElement.reportValidity()
+  } else {
+    e.preventDefault(); 
+    addToDoTask(createNewTaskInstance(newTaskTitle.value, newTaskDescription.value,newTaskCategory.value, newTaskDate.value, newTaskPriority.value))
+  }
+})
 closeNewTaskButton.addEventListener('click', (e)=>{closeTaskModal(e)})
 newListButtons.forEach((button)=>{button.addEventListener('click', openListModal)})
-saveNewlistButton.addEventListener('click', addToDoList)
+saveNewlistButton.addEventListener('click', (e)=>{
+  let isFormValid = listFormElement.checkValidity();
+  if (!isFormValid){
+    listFormElement.reportValidity()
+  } else {
+    e.preventDefault();
+    addToDoList(createNewList(newListTitle.value, newListDescription.value))
+  }
+})
 closeNewlistButton.addEventListener('click', (e)=>{closelistModal(e)})
 
 // Storage
@@ -67,13 +92,16 @@ function storageDisplay () {
   const storageLength = localStorage.length
   for (let i = 0; i < storageLength; i++) {
     if (localStorage.getItem(`task${i}`)){
-      const taskStoredItem = JSON.parse(localStorage.getItem(`task${i}`));
-      displayTask(taskStoredItem)
+      const storedTask = JSON.parse(localStorage.getItem(`task${i}`));
+      const storedTaskInstance = createNewTaskInstance(storedTask.title, storedTask.description, storedTask.category, storedTask.dueDate, storedTask.priority)
+      displayTask(storedTaskInstance)
+      // console.log(storedTaskInstance)
     }
     if (localStorage.getItem(`list${i}`)){
-      const listStoredItem = JSON.parse(localStorage.getItem(`list${i}`));
-      addListToTaskLists(listStoredItem)
-      console.log(listStoredItem)
+      const storedList = JSON.parse(localStorage.getItem(`list${i}`));
+      const storedListInstance = createNewList(storedList.title, storedList.description)
+      addListToTaskLists(storedListInstance)
+      console.log(storedList)
     }
     
   }
@@ -82,20 +110,15 @@ function storageDisplay () {
 
 // Functions
 function pageLoad() {
-  addListToTaskLists(personalToDoList)
-  addListToTaskLists(workToDoList)
+  console.log(toDoCategories, allTasks)
   console.log(localStorage)
   // localStorage.clear()
   storageDisplay()
-  // localStorage.clear()
 }
 
+// Task Functions
 function openTaskModal() {
   taskModal.showModal()
-}
-
-function openListModal() {
-  listModal.showModal()
 }
 
 function closeTaskModal(e) {
@@ -104,27 +127,23 @@ function closeTaskModal(e) {
   taskModal.close()
 }
 
-function closelistModal(e) {
-  e.preventDefault()
-  listFormElement.reset()
-  listModal.close()
-}
-
-function createNewTaskInstance() {
-  if (newTaskTitle.value === '') {return false}
-  const newTask = new ToDoItem(newTaskTitle.value, newTaskDescription.value,newTaskCategory.value, newTaskDate.value, newTaskPriority.value)
+function createNewTaskInstance(title, description, category, date, priority) {
+  const newTask = new ToDoItem(title, description, category, date, priority)
   newTask.checkDueDate()
+  addTaskToCategory(newTask)
   return newTask
 }
 
-function displayTask(task) {
-  addTaskToCategory(task)
-  allTasks.push(task)
-  addTaskToAllTasksList(task)
+function addTaskToCategory(task) {
+  toDoCategories.forEach((category) => {
+    if (category.title === task.category){
+      category.addTask(task)
+    }
+  })
+// }
 }
 
 function addToDoTask(task) {
-  // e.preventDefault()
   const newTask = task
   displayTask(newTask)
   dataTaskStorage(newTask)
@@ -132,22 +151,10 @@ function addToDoTask(task) {
   taskModal.close()
 }
 
-function addToDoList() {
-  if (newListTitle.value === '') {return false}
-  const newList = new ToDoList(newListTitle.value, newListDescription.value)
-  addListToTaskLists(newList)
-  dataListStorage(newList)
-  listFormElement.reset()
-  listModal.close()
-  document.getElementById('search').focus()
-}
-
-function addListToTaskLists(list) {
-  const newListElement = document.createElement('div')
-  toDoCategories.push(list)
-  newListElement.innerText = list.title
-  taskLists.appendChild(newListElement)
-  addListToCategoryDOM(list)
+function displayTask(task) {
+  allTasks.push(task)
+  addTaskToAllTasksList(task)
+  deleteTask(task)
 }
 
 function addTaskToAllTasksList(task){
@@ -156,6 +163,7 @@ function addTaskToAllTasksList(task){
   newTaskElement.setAttribute('id', task.title)
   addTaskTitleToList(newTaskElement, task)
   addTaskPriorityToList(newTaskElement, task)
+  addDeleteButton(newTaskElement, task)
   addTaskDateToList(newTaskElement, task)
   checkIfTaskIsDone(task)
 }
@@ -176,27 +184,27 @@ function addTaskTitleToList(div, task) {
 function addTaskDateToList(div, task) {
   const taskDate = document.createElement('p')
   taskDate.innerText = `Due: ${task.dueDate}`
+  taskDate.classList = 'task-due-date'
   div.appendChild(taskDate)
   allTasksList.appendChild(div)
 }
 
 function addTaskPriorityToList(div, task) {
   const taskPriority = document.createElement('span')
-  taskPriority.innerText = task.priority
+  taskPriority.innerHTML = task.priority
   taskPriority.classList = 'span-right'
   div.appendChild(taskPriority)
   allTasksList.appendChild(div)
-
   task.priority == 'high' ? div.classList.add('high'):
   task.priority == 'medium' ? div.classList.add('medium') : div.classList.add('low')
 }
 
-function addTaskToCategory(task) {
-  toDoCategories.forEach((category) => {
-    if (category.title === task.category){
-      category.addTask(task)
-    }
-  })
+function addDeleteButton(div, task) {
+  const taskDeleteIcon = document.createElement('div');
+  taskDeleteIcon.innerHTML = `<div id="${task.title}-delete"><i class="fa-solid fa-trash-can"></i></div>`
+  // onclick="deleteTask(${task.title})"
+  div.appendChild(taskDeleteIcon)
+  allTasksList.appendChild(div)
 }
 
 function checkIfTaskIsDone(task) {
@@ -205,9 +213,51 @@ function checkIfTaskIsDone(task) {
     checkbox.addEventListener('click', ()=>{
      checkbox.parentNode.classList.toggle('task-done')
      task.checkBoxClick()
-     console.log(task)
     })
   })
+}
+
+function deleteTask(task) {
+  const taskDeleteButton = document.getElementById(`${task.title}-delete`)
+  console.log(taskDeleteButton)
+  taskDeleteButton.addEventListener('click', ()=>{console.log(task.title)})
+  console.log(task)
+}
+
+// List Functions
+
+function openListModal() {
+  listModal.showModal()
+}
+
+function closelistModal(e) {
+  e.preventDefault()
+  listFormElement.reset()
+  listModal.close()
+}
+
+
+
+function createNewList(title, description) {
+  const newList = new ToDoList(title, description)
+  return newList
+}
+
+
+function addToDoList(list) {
+  const newList = list
+  addListToTaskLists(newList)
+  dataListStorage(newList)
+  listFormElement.reset()
+  listModal.close()
+}
+
+function addListToTaskLists(list) {
+  const newListElement = document.createElement('div')
+  toDoCategories.push(list)
+  newListElement.innerText = list.title
+  taskLists.appendChild(newListElement)
+  addListToCategoryDOM(list)
 }
 
 function addListToCategoryDOM (list) {

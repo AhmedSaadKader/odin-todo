@@ -118,8 +118,17 @@ main * {
 }
 
 .single-task {
+    display: grid;
+    grid-template-columns: 0.5fr 7fr 2fr 2fr;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
     margin-bottom: 0.25rem;
-    cursor: pointer;
+    /* cursor: pointer; */
+}
+
+.task-due-date {
+    grid-column: 2/3;
+    /* align-self: center; */
 }
 
 .task-done {
