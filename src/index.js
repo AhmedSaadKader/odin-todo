@@ -59,7 +59,7 @@ saveNewlistButton.addEventListener('click', (e)=>{
     listFormElement.reportValidity()
   } else {
     e.preventDefault();
-    const x = addToDoList(createNewList(newListTitle.value, newListDescription.value))
+    const x = addToDoList(createNewListInstance(newListTitle.value, newListDescription.value))
     dataListStorage(x)
   }
 })
@@ -86,7 +86,7 @@ function dataListStorage(list) {
   }
 }
 
-function updateTaskStorage() {
+function updateLocalStorage() {
   localStorage.clear()
   for (let i = 0; i < allTasks.length; i++) {
     localStorage.setItem(`task${i}`, JSON.stringify(allTasks[i]))
@@ -105,8 +105,8 @@ function storageDisplay () {
     }
     if (localStorage.getItem(`list${i}`)){
       const storedList = JSON.parse(localStorage.getItem(`list${i}`));
-      const storedListInstance = createNewList(storedList.title, storedList.description)
-      displayLists(storedListInstance)
+      const storedListInstance = createNewListInstance(storedList.title, storedList.description)
+      addToDoList(storedListInstance)
     }
   }
 }
@@ -249,7 +249,7 @@ function checkIfTaskIsDone(taskElement,task) {
         if(item === task){
           item.checkBoxClick()
           displayTasks(allTasksListDiv)
-          updateTaskStorage()
+          updateLocalStorage()
           // console.log(allTasks)   
         }
       })
@@ -265,7 +265,7 @@ function deleteTask(taskElement, task) {
         const itemIndex = allTasks.indexOf(item)
         allTasks.splice(itemIndex, 1)
         displayTasks(allTasksListDiv)
-        updateTaskStorage()
+        updateLocalStorage()
         console.log(itemIndex)
         console.log(allTasks)
       }
@@ -285,7 +285,7 @@ function closelistModal(e) {
   listModal.close()
 }
 
-function createNewList(title, description) {
+function createNewListInstance(title, description) {
   const newList = new ToDoList(title, description)
   return newList
 }
@@ -293,6 +293,7 @@ function createNewList(title, description) {
 
 function addToDoList(list) {
   const newList = list
+  toDoCategories.push(newList)
   displayLists(newList)
   listFormElement.reset()
   listModal.close()
@@ -300,11 +301,59 @@ function addToDoList(list) {
 }
 
 function displayLists(list) {
+  allListsDiv.innerHTML = ""
+  for (let i = 0; i < toDoCategories.length; i++) {
+    const newListElement = createNewList(toDoCategories[i])
+    allListsDiv.appendChild(newListElement)
+    addListToCategoryDOM(newListElement)
+    deleteList(newListElement, toDoCategories[i])
+  }
+}
+
+function createNewList(list) {
   const newListElement = document.createElement('div')
-  toDoCategories.push(list)
-  newListElement.innerText = list.title
-  allListsDiv.appendChild(newListElement)
-  addListToCategoryDOM(list)
+  const newListTitleElement = document.createElement('P')
+  newListElement.classList = "list-div"
+  if (document.getElementById(list.title)){
+    for (let i = 0; i < 100; i++) {
+      if (!document.getElementById(`${list.title}-${i}`)){
+        newListElement.setAttribute('id', `${list.title}-${i}`)
+        break
+      }
+    }
+  } else {
+    newListElement.setAttribute('id', list.title)
+  }
+  newListTitleElement.innerText = list.title
+  newListElement.appendChild(newListTitleElement)
+  const listDeleteIcon = createlistDeleteButton(list, newListElement)
+  newListElement.appendChild(listDeleteIcon)
+  return newListElement
+}
+
+function createlistDeleteButton(list, listElement) {
+  const listElementId = listElement.id
+  const listDeleteIcon = document.createElement('i');
+  listDeleteIcon.setAttribute('id', `${listElementId}-delete`)
+  listDeleteIcon.classList = 'fa-solid fa-trash-can list-delete-icon'
+  // listDeleteIcon.innerHTML = `<i class="fa-solid fa-trash-can"></i>`
+  return listDeleteIcon
+}
+
+function deleteList(listElement, list){
+  const listElementId = listElement.id
+  const listDeleteButton = document.getElementById(`${listElementId}-delete`)
+  listDeleteButton.addEventListener('click', ()=>{
+    toDoCategories.forEach(item => {
+      if(item === list){
+        const itemIndex = toDoCategories.indexOf(item)
+        toDoCategories.splice(itemIndex, 1)
+        displayLists(allListsDiv)
+        updateLocalStorage()
+        console.log(toDoCategories)
+      }
+    })
+  })
 }
 
 function addListToCategoryDOM (list) {

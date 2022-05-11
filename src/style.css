@@ -8,7 +8,6 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* margin: 0.4rem 2rem; */
     padding: 0.4rem 2rem;
     background-color: rgb(5, 5, 83);
     color: white;
@@ -18,7 +17,7 @@ header h2 i{
     padding-right: 0.5rem;
 }
 
-header button {
+header button, #search-button {
     background-color: rgb(5, 5, 83);
     border: none;
     color: white;
@@ -31,7 +30,7 @@ header button {
     width: 5rem;
 }
 
-header input {
+header input, #search-input {
     border-radius: 20px;
     padding: 0.5rem;
     border: none;
@@ -51,10 +50,8 @@ header input {
 
 main {
     display: grid;
-    /* grid-template-rows: 1fr 8fr; */
     background-color: rgb(207, 203, 203);
     min-height: 90vh;
-    /* height: 80%; */
 }
 
 main * {
@@ -65,7 +62,6 @@ main * {
 .cards {
     display: grid;
     grid-template-columns: 1fr repeat(2, 2fr);
-    /* grid-template-rows:  */
     gap: 1rem;
 }
 
@@ -128,7 +124,6 @@ main * {
 
 .task-due-date {
     grid-column: 2/3;
-    /* align-self: center; */
 }
 
 .task-done {
@@ -145,4 +140,20 @@ main * {
 
 .medium {
     border: 1px solid green;
+}
+
+.list-div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.list-delete-icon {
+    display: flex;
+    align-items: center;
+}
+
+#search-bar-div {
+    background-color:  rgb(5, 5, 83);
+    padding: 0.5rem;
 }
