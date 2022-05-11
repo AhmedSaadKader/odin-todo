@@ -19,8 +19,8 @@ const saveNewTaskButton = document.getElementById('save-task')
 const closeNewTaskButton = document.getElementById('close-task-modal')
 const saveNewlistButton = document.getElementById('save-list')
 const closeNewlistButton = document.getElementById('close-list')
-const taskLists = document.getElementById('to-do-lists')
-const allTasksList = document.getElementById('all-tasks-list')
+const allListsDiv = document.getElementById('to-do-lists')
+const allTasksListDiv = document.getElementById('all-tasks-list')
 const newTaskTitle = document.getElementById('task-title')
 const newTaskDescription = document.getElementById('task-description')
 const newTaskCategory = document.getElementById('task-category')
@@ -47,7 +47,8 @@ saveNewTaskButton.addEventListener('click', (e)=>{
     taskFormElement.reportValidity()
   } else {
     e.preventDefault(); 
-    addToDoTask(createNewTaskInstance(newTaskTitle.value, newTaskDescription.value,newTaskCategory.value, newTaskDate.value, newTaskPriority.value))
+    let newTask = addToDoTask(createNewTaskInstance(newTaskTitle.value, newTaskDescription.value,newTaskCategory.value, newTaskDate.value, newTaskPriority.value))
+    dataTaskStorage(newTask)
   }
 })
 closeNewTaskButton.addEventListener('click', (e)=>{closeTaskModal(e)})
@@ -58,7 +59,8 @@ saveNewlistButton.addEventListener('click', (e)=>{
     listFormElement.reportValidity()
   } else {
     e.preventDefault();
-    addToDoList(createNewList(newListTitle.value, newListDescription.value))
+    const x = addToDoList(createNewList(newListTitle.value, newListDescription.value))
+    dataListStorage(x)
   }
 })
 closeNewlistButton.addEventListener('click', (e)=>{closelistModal(e)})
@@ -84,8 +86,14 @@ function dataListStorage(list) {
   }
 }
 
-function updateTaskStorage(task) {
-
+function updateTaskStorage() {
+  localStorage.clear()
+  for (let i = 0; i < allTasks.length; i++) {
+    localStorage.setItem(`task${i}`, JSON.stringify(allTasks[i]))
+  }
+  for (let i = 0; i < toDoCategories.length; i++){
+    localStorage.setItem(`list${i}`, JSON.stringify(toDoCategories[i]))
+  }
 }
 
 function storageDisplay () {
@@ -93,25 +101,18 @@ function storageDisplay () {
   for (let i = 0; i < storageLength; i++) {
     if (localStorage.getItem(`task${i}`)){
       const storedTask = JSON.parse(localStorage.getItem(`task${i}`));
-      const storedTaskInstance = createNewTaskInstance(storedTask.title, storedTask.description, storedTask.category, storedTask.dueDate, storedTask.priority)
-      displayTask(storedTaskInstance)
-      // console.log(storedTaskInstance)
+      addToDoTask(createNewTaskInstance(storedTask.title, storedTask.description, storedTask.category, storedTask.dueDate, storedTask.priority, storedTask.done))
     }
     if (localStorage.getItem(`list${i}`)){
       const storedList = JSON.parse(localStorage.getItem(`list${i}`));
       const storedListInstance = createNewList(storedList.title, storedList.description)
-      addListToTaskLists(storedListInstance)
-      console.log(storedList)
+      displayLists(storedListInstance)
     }
-    
   }
-
 }
 
 // Functions
 function pageLoad() {
-  console.log(toDoCategories, allTasks)
-  console.log(localStorage)
   // localStorage.clear()
   storageDisplay()
 }
@@ -127,8 +128,8 @@ function closeTaskModal(e) {
   taskModal.close()
 }
 
-function createNewTaskInstance(title, description, category, date, priority) {
-  const newTask = new ToDoItem(title, description, category, date, priority)
+function createNewTaskInstance(title, description, category, date, priority, done) {
+  const newTask = new ToDoItem(title, description, category, date, priority, done)
   newTask.checkDueDate()
   addTaskToCategory(newTask)
   return newTask
@@ -143,85 +144,133 @@ function addTaskToCategory(task) {
 // }
 }
 
-function addToDoTask(task) {
+function addToDoTask(task, taskListDOM=allTasksListDiv) {
   const newTask = task
-  displayTask(newTask)
-  dataTaskStorage(newTask)
+  allTasks.push(newTask)
+  displayTasks(taskListDOM)
   taskFormElement.reset()
   taskModal.close()
+  return newTask
 }
 
-function displayTask(task) {
-  allTasks.push(task)
-  addTaskToAllTasksList(task)
-  deleteTask(task)
+function displayTasks(taskListDOM) {
+  taskListDOM.innerHTML = "";
+  const taskList = allTasks
+  for (let i = 0; i < taskList.length; i++) {
+    let newTaskElement = createTaskDiv(taskList[i])
+    taskListDOM.appendChild(newTaskElement)
+    checkIfTaskIsDone(newTaskElement, taskList[i])
+    deleteTask(newTaskElement, taskList[i])
+  }
 }
 
-function addTaskToAllTasksList(task){
+function sortTasksList() {
+
+}
+
+function createTaskDiv(task){
   const newTaskElement = document.createElement('div')
   newTaskElement.classList = 'single-task'
-  newTaskElement.setAttribute('id', task.title)
-  addTaskTitleToList(newTaskElement, task)
-  addTaskPriorityToList(newTaskElement, task)
-  addDeleteButton(newTaskElement, task)
-  addTaskDateToList(newTaskElement, task)
-  checkIfTaskIsDone(task)
+  if (document.getElementById(task.title)){
+    for (let i = 0; i < 100; i++) {
+      if (!document.getElementById(`${task.title}-${i}`)){
+        newTaskElement.setAttribute('id', `${task.title}-${i}`)
+        break
+      }
+    }
+  } else {
+    newTaskElement.setAttribute('id', task.title)
+  }
+  let taskInput = createTaskCheckboxElement(task, newTaskElement)
+  let taskInputLabel = createTaskTitleElement(task)
+  let taskPriority = createTaskPriorityElement(task)
+  let taskDeleteIcon = createTaskDeleteButton(task, newTaskElement)
+  let taskDate = createTaskDateElement(task)
+  newTaskElement.append(taskInput, taskInputLabel, taskPriority, taskDeleteIcon, taskDate)
+  addPriorityStyleToTaskDiv(newTaskElement, task)
+  return newTaskElement
 }
 
-function addTaskTitleToList(div, task) {
+function createTaskCheckboxElement(task, taskElement ) {
   const taskInput = document.createElement('input')
+  const taskElementId = taskElement.id
+  taskInput.setAttribute('id', `${taskElementId}-checkbox`)
   taskInput.setAttribute('type', 'checkbox')
   taskInput.classList = 'title-checkbox'
+  if (task.done === true) {
+    taskInput.checked = true
+    taskElement.classList.add('task-done')
+  }
   taskInput.setAttribute('name', task.title)
+  return taskInput
+}
+
+function createTaskTitleElement(task) {
   const taskInputLabel = document.createElement('label')
   taskInputLabel.setAttribute('for', task.title)
   taskInputLabel.innerText = task.title
-  div.appendChild(taskInput)
-  div.appendChild(taskInputLabel)
-  allTasksList.appendChild(div)
+  return taskInputLabel
 }
 
-function addTaskDateToList(div, task) {
-  const taskDate = document.createElement('p')
-  taskDate.innerText = `Due: ${task.dueDate}`
-  taskDate.classList = 'task-due-date'
-  div.appendChild(taskDate)
-  allTasksList.appendChild(div)
-}
-
-function addTaskPriorityToList(div, task) {
+function createTaskPriorityElement(task) {
   const taskPriority = document.createElement('span')
   taskPriority.innerHTML = task.priority
   taskPriority.classList = 'span-right'
-  div.appendChild(taskPriority)
-  allTasksList.appendChild(div)
+  return taskPriority
+}
+
+function addPriorityStyleToTaskDiv(div, task) {
   task.priority == 'high' ? div.classList.add('high'):
   task.priority == 'medium' ? div.classList.add('medium') : div.classList.add('low')
 }
 
-function addDeleteButton(div, task) {
+function createTaskDeleteButton(task, taskElement) {
+  const taskElementId = taskElement.id
   const taskDeleteIcon = document.createElement('div');
-  taskDeleteIcon.innerHTML = `<div id="${task.title}-delete"><i class="fa-solid fa-trash-can"></i></div>`
-  // onclick="deleteTask(${task.title})"
-  div.appendChild(taskDeleteIcon)
-  allTasksList.appendChild(div)
+  taskDeleteIcon.innerHTML = `<div id="${taskElementId}-delete"><i class="fa-solid fa-trash-can"></i></div>`
+  return taskDeleteIcon
 }
 
-function checkIfTaskIsDone(task) {
-  const tasksCheckboxes = document.querySelectorAll('.title-checkbox')
-  tasksCheckboxes.forEach((checkbox) => {
-    checkbox.addEventListener('click', ()=>{
-     checkbox.parentNode.classList.toggle('task-done')
-     task.checkBoxClick()
+function createTaskDateElement(task) {
+  const taskDate = document.createElement('p')
+  taskDate.innerText = `Due: ${task.dueDate}`
+  taskDate.classList = 'task-due-date'
+  return taskDate
+}
+
+
+function checkIfTaskIsDone(taskElement,task) {
+  const taskElementId = taskElement.id
+  const tasksCheckbox = document.getElementById(`${taskElementId}-checkbox`)
+  tasksCheckbox.addEventListener('change', (e)=>{
+      console.log(e, tasksCheckbox.parentNode)
+      tasksCheckbox.parentNode.classList.toggle('task-done')   
+      allTasks.forEach(item => {
+        if(item === task){
+          item.checkBoxClick()
+          displayTasks(allTasksListDiv)
+          updateTaskStorage()
+          // console.log(allTasks)   
+        }
+      })
+    })
+  }
+
+function deleteTask(taskElement, task) {
+  const taskElementId = taskElement.id
+  const taskDeleteButton = document.getElementById(`${taskElementId}-delete`)
+  taskDeleteButton.addEventListener('click', ()=>{
+    allTasks.forEach(item => {
+      if(item === task){
+        const itemIndex = allTasks.indexOf(item)
+        allTasks.splice(itemIndex, 1)
+        displayTasks(allTasksListDiv)
+        updateTaskStorage()
+        console.log(itemIndex)
+        console.log(allTasks)
+      }
     })
   })
-}
-
-function deleteTask(task) {
-  const taskDeleteButton = document.getElementById(`${task.title}-delete`)
-  console.log(taskDeleteButton)
-  taskDeleteButton.addEventListener('click', ()=>{console.log(task.title)})
-  console.log(task)
 }
 
 // List Functions
@@ -236,8 +285,6 @@ function closelistModal(e) {
   listModal.close()
 }
 
-
-
 function createNewList(title, description) {
   const newList = new ToDoList(title, description)
   return newList
@@ -246,17 +293,17 @@ function createNewList(title, description) {
 
 function addToDoList(list) {
   const newList = list
-  addListToTaskLists(newList)
-  dataListStorage(newList)
+  displayLists(newList)
   listFormElement.reset()
   listModal.close()
+  return newList
 }
 
-function addListToTaskLists(list) {
+function displayLists(list) {
   const newListElement = document.createElement('div')
   toDoCategories.push(list)
   newListElement.innerText = list.title
-  taskLists.appendChild(newListElement)
+  allListsDiv.appendChild(newListElement)
   addListToCategoryDOM(list)
 }
 
@@ -264,6 +311,5 @@ function addListToCategoryDOM (list) {
   const categoryOption = document.createElement('option')
   categoryOption.setAttribute('value', list.title)
   categoryOption.innerText = list.title
-  if(list.title == "Personal"){categoryOption.selected = true}
   newTaskCategory.appendChild(categoryOption)
 }
