@@ -10,10 +10,18 @@ export default class ToDoItem {
 
     checkDueDate() {
         let taskDueDate = this.dueDate
-        var nowDate = new Date(); 
-        var date = nowDate.getFullYear()+'/'+(nowDate.getMonth()+1)+'/'+nowDate.getDate(); 
+        let date = new Date();
+        let nowMonth = date.getMonth() + 1
+        let nowDay = date.getDate()
+        if (nowMonth < 10){
+            nowMonth = `0${nowMonth}`
+        }
+        if (nowDay < 10) {
+            nowDay = `0${nowDay}`
+        }
+        var nowDate = date.getFullYear()+'-'+nowMonth+'-'+nowDay; 
         if(taskDueDate === ''){
-            taskDueDate = date
+            taskDueDate = nowDate
         } 
         this.dueDate = taskDueDate
     }

@@ -28,6 +28,9 @@ const newTaskDate = document.getElementById('task-date')
 const newTaskPriority = document.getElementById('task-priority')
 const newListTitle = document.getElementById('list-title')
 const newListDescription = document.getElementById('list-description')
+const searchDivElement = document.getElementById('search-tasks-list')
+const searchBarElement = document.getElementById('search-input')
+const searchDateElement = document.getElementById('date-search')
 
 
 // test
@@ -40,7 +43,7 @@ testButton.addEventListener('click', () => {
 
 // Event Listeners
 window.addEventListener('load', pageLoad)
-newTaskButtons.forEach((button)=>{button.addEventListener('click', openTaskModal)})
+newTaskButtons.forEach((button)=>{button.addEventListener('click', ()=>{openTaskModal();})})
 saveNewTaskButton.addEventListener('click', (e)=>{
   let isFormValid = taskFormElement.checkValidity();
   if (!isFormValid){
@@ -64,6 +67,16 @@ saveNewlistButton.addEventListener('click', (e)=>{
   }
 })
 closeNewlistButton.addEventListener('click', (e)=>{closelistModal(e)})
+
+searchBarElement.addEventListener('input', (e)=>{
+  const value = e.target.value
+  displaySearchTasks(value)
+})
+
+searchDateElement.addEventListener('input', (e)=>{
+  const value = e.target.value
+  displaySearchTasks(value)
+})
 
 // Storage
 function dataTaskStorage(task) {
@@ -144,28 +157,94 @@ function addTaskToCategory(task) {
 // }
 }
 
-function addToDoTask(task, taskListDOM=allTasksListDiv) {
+function addToDoTask(task) {
   const newTask = task
   allTasks.push(newTask)
-  displayTasks(taskListDOM)
+  displayAllTasksList()
+
   taskFormElement.reset()
   taskModal.close()
   return newTask
 }
 
-function displayTasks(taskListDOM) {
-  taskListDOM.innerHTML = "";
-  const taskList = allTasks
-  for (let i = 0; i < taskList.length; i++) {
-    let newTaskElement = createTaskDiv(taskList[i])
-    taskListDOM.appendChild(newTaskElement)
-    checkIfTaskIsDone(newTaskElement, taskList[i])
-    deleteTask(newTaskElement, taskList[i])
+function displayTask(div, task) {
+  let newTaskElement = createTaskDiv(task)
+  div.appendChild(newTaskElement)
+  checkIfTaskIsDone(newTaskElement, task)
+  deleteTask(newTaskElement, task)
+}
+
+function displayAllTasksList() {
+  allTasksListDiv.innerHTML = "";
+  for (let i = 0; i < allTasks.length; i++) {
+    displayTask(allTasksListDiv, allTasks[i])
+    displaySearchTasks(searchBarElement.value)
   }
 }
 
 function sortTasksList() {
+  searchDivElement.innerHTML = ""
+  const nowDate = new Date()
+  const today = nowDate.getFullYear()+'-'+(nowDate.getMonth()+1)+'-'+nowDate.getDate()
+  let sortedTasks = allTasks.map(task => {
+    if (task.dueDate == today){
+        let newTaskElement = createTaskDiv(task)
+        searchDivElement.appendChild(newTaskElement)
+        checkIfTaskIsDone(newTaskElement, task)
+        deleteTask(newTaskElement, task)
+      console.log(task.title)
+      return task
+    }
+  })
+  console.log(today, sortedTasks)
+}
 
+function displaySearchTasks(searchTitleValue, dateValue) {
+  let sortedTasks = []
+  searchDivElement.innerHTML = ""
+  if (searchBarElement.value != ""){
+    sortedTasks = searchTitleTask(allTasks, searchTitleValue)
+    console.log(sortedTasks)
+  }
+  if (searchDateElement.value != ""){
+    if (searchBarElement.value == "") {
+      sortedTasks = searchDateTask(allTasks, dateValue)
+    } else {
+      sortedTasks = searchDateTask(sortedTasks, dateValue)
+      console.log(sortedTasks)
+    }
+  }
+  
+  sortedTasks.forEach(task => {
+    if (task){
+      displayTask(searchDivElement, task)
+    }
+  })
+}
+
+function searchTitleTask(tasklist, searchTitleValue) {
+  let sortedTasks = tasklist.map(task => {
+    if (searchBarElement.value != ""){
+      if (task.title.includes(searchTitleValue)) {
+        return task
+      }
+    }
+  })
+  return sortedTasks
+}
+
+function searchDateTask(tasklist, dateValue) {
+  let sortedTasks = tasklist.map(task => {
+    if(task){
+      if (searchDateElement != "") {
+        if (task.dueDate == searchDateElement.value){
+          return task
+        }
+      }
+    }
+  })
+
+  return sortedTasks
 }
 
 function createTaskDiv(task){
@@ -186,7 +265,8 @@ function createTaskDiv(task){
   let taskPriority = createTaskPriorityElement(task)
   let taskDeleteIcon = createTaskDeleteButton(task, newTaskElement)
   let taskDate = createTaskDateElement(task)
-  newTaskElement.append(taskInput, taskInputLabel, taskPriority, taskDeleteIcon, taskDate)
+  let taskCategory = createTaskCategoryElement(task)
+  newTaskElement.append(taskInput, taskInputLabel, taskPriority, taskDeleteIcon, taskDate, taskCategory)
   addPriorityStyleToTaskDiv(newTaskElement, task)
   return newTaskElement
 }
@@ -238,19 +318,23 @@ function createTaskDateElement(task) {
   return taskDate
 }
 
+function createTaskCategoryElement(task) {
+  const taskCategory = document.createElement('span');
+  taskCategory.innerHTML = task.category
+  taskCategory.classList = 'span-right'
+  return taskCategory
+}
 
 function checkIfTaskIsDone(taskElement,task) {
   const taskElementId = taskElement.id
   const tasksCheckbox = document.getElementById(`${taskElementId}-checkbox`)
   tasksCheckbox.addEventListener('change', (e)=>{
-      console.log(e, tasksCheckbox.parentNode)
       tasksCheckbox.parentNode.classList.toggle('task-done')   
       allTasks.forEach(item => {
         if(item === task){
           item.checkBoxClick()
-          displayTasks(allTasksListDiv)
-          updateLocalStorage()
-          // console.log(allTasks)   
+          displayAllTasksList()
+            updateLocalStorage()
         }
       })
     })
@@ -264,10 +348,8 @@ function deleteTask(taskElement, task) {
       if(item === task){
         const itemIndex = allTasks.indexOf(item)
         allTasks.splice(itemIndex, 1)
-        displayTasks(allTasksListDiv)
+        displayAllTasksList()
         updateLocalStorage()
-        console.log(itemIndex)
-        console.log(allTasks)
       }
     })
   })
@@ -295,6 +377,7 @@ function addToDoList(list) {
   const newList = list
   toDoCategories.push(newList)
   displayLists(newList)
+  addListToCategoryDOM(newList)
   listFormElement.reset()
   listModal.close()
   return newList
@@ -305,7 +388,6 @@ function displayLists(list) {
   for (let i = 0; i < toDoCategories.length; i++) {
     const newListElement = createNewList(toDoCategories[i])
     allListsDiv.appendChild(newListElement)
-    addListToCategoryDOM(newListElement)
     deleteList(newListElement, toDoCategories[i])
   }
 }
@@ -336,7 +418,6 @@ function createlistDeleteButton(list, listElement) {
   const listDeleteIcon = document.createElement('i');
   listDeleteIcon.setAttribute('id', `${listElementId}-delete`)
   listDeleteIcon.classList = 'fa-solid fa-trash-can list-delete-icon'
-  // listDeleteIcon.innerHTML = `<i class="fa-solid fa-trash-can"></i>`
   return listDeleteIcon
 }
 
@@ -350,7 +431,6 @@ function deleteList(listElement, list){
         toDoCategories.splice(itemIndex, 1)
         displayLists(allListsDiv)
         updateLocalStorage()
-        console.log(toDoCategories)
       }
     })
   })

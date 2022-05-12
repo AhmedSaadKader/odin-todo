@@ -17,7 +17,7 @@ header h2 i{
     padding-right: 0.5rem;
 }
 
-header button, #search-button {
+header button{
     background-color: rgb(5, 5, 83);
     border: none;
     color: white;
@@ -25,15 +25,23 @@ header button, #search-button {
 
 .create-button {
     padding: 0.5rem;
-    border-radius: 20px;
-    background-color: blue;
+    border-radius: 10px;
+    background-color: rgb(87, 87, 170);
+    color: white;
     width: 5rem;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 4px rgb(22, 22, 22);
 }
 
-header input, #search-input {
-    border-radius: 20px;
-    padding: 0.5rem;
-    border: none;
+.create-button:hover {
+    background-color: rgb(0, 0, 3);
+}
+
+.create-button:active {
+    background-color: rgb(0, 0, 3);
+    box-shadow: 0 1px rgb(22, 22, 22);
+    transform: translateY(1px);
 }
 
 .user-wrap {
@@ -73,7 +81,7 @@ main * {
 }
 
 .card h3 {
-    border-bottom: 1px solid black;
+    /* border-bottom: 1px solid black; */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -154,6 +162,26 @@ main * {
 }
 
 #search-bar-div {
-    background-color:  rgb(5, 5, 83);
-    padding: 0.5rem;
+    padding: 0.25rem;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: auto;
 }
+
+.search-form {
+    display: flex;
+
+}
+
+#search-input {
+    border-radius: 10px;
+    padding: 0.25rem;
+    margin-right: 0.5rem;
+    width: 150px;
+}
+
+#search-button {
+    background-color: white;
+    border: none;
+} 
