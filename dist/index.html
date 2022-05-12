@@ -1,9 +1,113 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>ToDo List</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"><script defer src="runtime.bundle.js"></script><script defer src="index.bundle.js"></script></head>
-  <body>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-do</title>
+    <script src="https://kit.fontawesome.com/7734e51b41.js" crossorigin="anonymous"></script>
+<script defer src="runtime.bundle.js"></script><script defer src="index.bundle.js"></script></head>
+<body>
+    <header>
+        <h2> <i class="fa-solid fa-list-check"></i>To-Do</h2>
+        <div class="main-header">
+            <h1>Hello, Ahmed</h1>
+        </div>
+
+        <div>
+            <button class="create-button new-task-button">New Task</button>
+            <button class="create-button new-list-button">New List</button>
+        </div>
+        <div class="user-wrap">
+            <img src="./professionalPhoto.jpg" alt="">
+            <h4>Ahmed Saad</h4>
+        </div>
+    </header>
+    
+    <main>
+
+        <div class="cards">
+            <div class="card" >
+                <h3>To-Do Lists <i class="fa-solid fa-circle-plus new-list-button"></i></h3>
+                <div id="to-do-lists"></div>
+            </div>
+            <div class="card">
+                <h3>All Tasks <i class="fa-solid fa-circle-plus new-task-button"></i></h3>
+                <div id="all-tasks-list">
+                </div>
+            </div>
+            <div class="card">
+                <div id="search-bar-div">
+                    <form action="" class="search-form">
+                        <button id="search-button"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        <input type="text" id="search-input">
+                        <input type="date" id="date-search">
+                    </form>
+                </div>
+                <div id="search-tasks-list">
+                    
+                </div>
+            </div>
+        </div>
+        <dialog id="taskModal" class="modal">
+            <div class="modal-content">
+                <form action="#" id="task-form">
+                    <h2>Add New Task</h2>
+                    <div>
+                        <label for="task-title">Title:</label>
+                        <input type="text" id="task-title" name="task-title" required>
+                    </div>
+                    <div>
+                        <label for="task-description">Description:</label>
+                        <input type="text" id="task-description" name="task-description">
+                    </div>
+                    <div>
+                        <label for="task-category">Category:</label>
+                        <select id="task-category" name="task-category">
+                        </select> 
+                    </div>
+                    <div>
+                        <label for="task-date">Due-Date:</label>
+                        <input type="date" id="task-date" name="task-date">
+                    </div>
+                    <div>
+                        <label for="task-time">Time:</label>
+                        <input type="time" id="task-time" name="task-time">
+                    </div>
+                    <div>
+                        <label for="task-priority">Priority:</label>
+                        <select id="task-priority" name="task-priority">
+                            <option value="high">high</option>
+                            <option value="medium">medium</option>
+                            <option value="low">low</option>
+                        </select> 
+                    </div>
+                    <div>
+                        <button type="submit" value="Submit" id="save-task">Save</button>
+                        <button id="close-task-modal">close</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
+        <dialog class="modal" id="list-modal">
+            <h2>Add New Category</h2>
+            <div class="modal-content">
+                <form action="" id="list-form">
+                    <div>
+                        <label for="list-title">Title:</label>
+                        <input type="text" name="list-title" id="list-title" required>
+                    </div>
+                    <div>
+                        <label for="list-description">Description:</label>
+                        <input type="text" name="list-description" id="list-description">
+                    </div>
+                    <div>
+                        <button type="submit" value="Submit" id="save-list">Save</button>
+                        <button id="close-list">Close</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
+    </main>
+</body>
 </html>
