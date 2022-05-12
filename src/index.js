@@ -126,7 +126,6 @@ function storageDisplay () {
 
 // Functions
 function pageLoad() {
-  // localStorage.clear()
   storageDisplay()
 }
 
@@ -182,23 +181,6 @@ function displayAllTasksList() {
   }
 }
 
-function sortTasksList() {
-  searchDivElement.innerHTML = ""
-  const nowDate = new Date()
-  const today = nowDate.getFullYear()+'-'+(nowDate.getMonth()+1)+'-'+nowDate.getDate()
-  let sortedTasks = allTasks.map(task => {
-    if (task.dueDate == today){
-        let newTaskElement = createTaskDiv(task)
-        searchDivElement.appendChild(newTaskElement)
-        checkIfTaskIsDone(newTaskElement, task)
-        deleteTask(newTaskElement, task)
-      console.log(task.title)
-      return task
-    }
-  })
-  console.log(today, sortedTasks)
-}
-
 function displaySearchTasks(searchTitleValue, dateValue) {
   let sortedTasks = []
   searchDivElement.innerHTML = ""
@@ -247,6 +229,20 @@ function searchDateTask(tasklist, dateValue) {
   return sortedTasks
 }
 
+function editTask(taskDiv, task) {
+  taskDiv.addEventListener('click', (e) => {
+    console.log(taskDiv)
+    newTaskTitle.value = task.title
+    newTaskDescription.value = task.description
+    newTaskCategory.value = task.category
+    newTaskDate.value = task.dueDate
+    newTaskPriority.value = task.priority
+    deleteTask(taskDiv, task)
+    openTaskModal()
+  })
+
+}
+
 function createTaskDiv(task){
   const newTaskElement = document.createElement('div')
   newTaskElement.classList = 'single-task'
@@ -267,6 +263,7 @@ function createTaskDiv(task){
   let taskDate = createTaskDateElement(task)
   let taskCategory = createTaskCategoryElement(task)
   newTaskElement.append(taskInput, taskInputLabel, taskPriority, taskDeleteIcon, taskDate, taskCategory)
+  editTask(newTaskElement, task)
   addPriorityStyleToTaskDiv(newTaskElement, task)
   return newTaskElement
 }
